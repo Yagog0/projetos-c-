@@ -1,0 +1,128 @@
+#include <iostream>
+#include <time.h>
+#include <stdlib.h>
+using namespace std;
+
+int main()
+{
+    int opcao = 0;
+    srand(time(NULL));
+
+    do
+    {
+        // Menu inicial
+        cout << "Escolha uma opcao: \n";
+        cout << "1 - jogar\n";
+        cout << "2 - Sobre\n";
+        cout << "3 - Sair\n";
+        cin >> opcao;
+
+        switch (opcao)
+        {
+        case 1:
+        {
+            int codigo[4];
+            int tamanho = 0;
+            while (tamanho < 4)
+            {
+                int num = rand() % 6 + 1;
+                bool repetido = false;
+                for (int i = 0; i < tamanho; i++)
+                {
+                    if (codigo[i] == num)
+                    {
+                        repetido = true;
+                        break;
+                    }
+                }
+                if (!repetido)
+                {
+                    codigo[tamanho] = num;
+                    tamanho++;
+                }
+            }
+
+            int tentativa[4];
+            int tentativasRestantes = 10;
+            bool venceu = false;
+            // Loop do jogo
+            while (tentativasRestantes > 0)
+            {
+                cout << "\nTentativas restantes: " << tentativasRestantes << endl;
+                cout << "Digite 4 números de 1 a 6 (sem repetir): ";
+                for (int i = 0; i < 4; i++)
+                {
+                    cin >> tentativa[i];
+                }
+                int corretos = 0;
+                int posErrada = 0;
+                bool codigoUsado[4] = {false, false, false, false};
+                bool tentativaUsada[4] = {false, false, false, false};
+                // Passo 1: Números corretos e posição correta
+                for (int i = 0; i < 4; i++)
+                {
+                    if (tentativa[i] == codigo[i])
+                    {
+                        corretos++;
+                        codigoUsado[i] = true;
+                        tentativaUsada[i] = true;
+                    }
+                }
+                // Passo 2: Números corretos na posição errada
+                for (int i = 0; i < 4; i++)
+                {
+                    if (tentativaUsada[i])
+                        continue;
+                    for (int j = 0; j < 4; j++)
+                    {
+                        if (!codigoUsado[j] && tentativa[i] == codigo[j])
+                        {
+                            posErrada++;
+                            codigoUsado[j] = true;
+                            break;
+                        }
+                    }
+                }
+                cout << "✔️  Números corretos e na posição certa: " << corretos << endl;
+                cout << "🔄 Números corretos, mas na posição errada: " << posErrada << endl;
+                if (corretos == 4)
+                {
+                    venceu = true;
+                    break;
+                }
+                tentativasRestantes--;
+            }
+            if (venceu)
+            {
+                cout << "Parabéns! Você venceu!" << endl;
+            }
+            else
+            {
+                cout << "Você perdeu! O código era: ";
+                for (size_t i = 0; i < 4; i++)
+                {
+                    cout << codigo[i] << " ";
+                }
+                cout << endl;
+            }
+            break;
+        }
+        case 2:
+            cout << "Sobre o jogo: \n";
+            cout << "Esse jogo foi feito para fins educacionais.\n";
+            cout << "Ele foi feito para aprender a programar em C++.\n";
+            cout << "Ele foi feito por um aluno do curso de C++.\n";
+            break;
+        case 3:
+            cout << "Saindo do jogo...\n";
+            break;
+        default:
+            cout << "Opção inválida! Tente novamente.\n";
+            break;
+        }
+
+    } while (opcao != 3);
+
+    system("pause");
+    return 0;
+}
