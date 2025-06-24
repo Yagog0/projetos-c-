@@ -1,0 +1,183 @@
+/*
+Nomes: Julia Alves Franca, Victória Coelho Soares, Débora Martins Araújo, Yago Maba.
+Disciplina: Algoritmos e programação I.
+Professor: Rafael Martins.
+*/
+#include <iostream>
+#include <time.h>
+using namespace std;
+
+#define TAM 4
+
+int main() {
+    int matrizPrincipal[TAM][TAM] = {1, 4, 5, 2, 7, 2, 8, 7, 3, 6, 1, 4, 6, 5, 3, 8}, matrizGabarito[TAM][TAM], matrizJogo[TAM][TAM];
+    int opcao;
+
+    do {
+        srand(time(NULL));
+        int numeroAleatorio = rand() % 4 + 1; //usado para gerar numeros de 1 a 4 
+
+        cout << "\n===== JOGO DA MEMORIA =====" << endl; //menu do jogo 
+        cout << "1 - Iniciar jogo" << endl;
+        cout << "2 - Encerrar" << endl;
+        cin >> opcao;
+
+        switch (opcao) {
+        case 1: { //inicia o jogo 
+            cout<<"\033c"; // limpa a tela sempre que volta ao inicio
+            switch (numeroAleatorio) {
+            case 1: // matriz 1: matriz principal
+                cout << numeroAleatorio << endl;
+                for (int i = 0; i < TAM; i++) {
+                    for (int j = 0; j < TAM; j++) {
+                        matrizGabarito[i][j] = matrizPrincipal[i][j];
+                    }
+                }
+                break;
+                
+            case 2: //matriz 2: matriz transposta
+                cout << numeroAleatorio << endl;
+                for (int i = 0; i < TAM; i++) {
+                    for (int j = 0; j < TAM; j++) {
+                        matrizGabarito[i][j] = matrizPrincipal[j][i];
+                    }
+                }
+                break;
+                
+            case 3: //matriz 3: invertida por linha 
+                cout << numeroAleatorio << endl;
+                for (int i = 0; i < TAM; i++) {
+                    for (int j = 0; j < TAM; j++) {
+                        matrizGabarito[i][j] = matrizPrincipal[TAM - 1 - i][j];
+                    }
+                }
+                break;
+                
+            case 4: //matriz 4: invertida por coluna 
+                cout << numeroAleatorio << endl;
+                for (int i = 0; i < TAM; i++) {
+                    for (int j = 0; j < TAM; j++) {
+                        matrizGabarito[i][j] = matrizPrincipal[i][TAM - 1 - j];
+                    }
+                }
+                break;
+            }
+            
+            //inicializa a matriz do jogador com 0 
+            for (int i = 0; i < TAM; i++) {
+                for (int j = 0; j < TAM; j++) {
+                    matrizJogo[i][j] = 0;
+                }
+            }
+            int jogadas = 0, pares = 0;
+            
+            //loop do jogo: controle do numero de jogadas (max de jogadas: 24, max de pares a serem formados: 8)
+            while (jogadas < 24 && pares < 8) {
+                
+                //imprime a matriz atual do jogador 
+                cout << "\nMatriz atual:\n";
+                for (int i = 0; i < TAM; i++) {
+                    for (int j = 0; j < TAM; j++) {//se o da posição for 0 -> posição vazia. imprime um *
+                        if (matrizJogo[i][j] == 0)
+                            cout << "\t" << "* ";
+                        else
+                            cout << "\t" << matrizJogo[i][j];
+                    }
+                    cout << "\t\n";
+                }
+
+                int linha1, coluna1, linha2, coluna2, jogadaValida = 1;
+                //faz a leitura das jogadas do jogador 
+                cout << "digite a linha e a coluna da primeira peca a ser revelada (1 a 4): " << endl;
+                cin >> linha1 >> coluna1;
+                linha1--; coluna1--; //usado só para ser de 1 a 4 e nao de 0 a 3
+
+                cout << "digite a linha e a coluna da segunda peca a ser revelada (1 a 4): " << endl;
+                cin >> linha2 >> coluna2;
+                linha2--; coluna2--;
+                
+                //if para fazer a verificação de possiveis jogadas invalidas 
+                if (linha1 == linha2 && coluna1 == coluna2) { //caso o usuario escolha a mesma posição
+                    cout << "Posicoes iguais!" << endl;
+                    jogadaValida = 0;
+                }
+                if (linha1 < 0 || linha1 >= TAM || coluna1 < 0 || coluna1 >= TAM ||
+                    linha2 < 0 || linha2 >= TAM || coluna2 < 0 || coluna2 >= TAM) {
+                    cout << "Indices fora do limite da matriz. JOGADA NOK" << endl; 
+                    jogadaValida = 0;
+                }
+                if (matrizJogo[linha1][coluna1] != 0 || matrizJogo[linha2][coluna2] != 0) {
+                    cout << "Uma ou ambas as posicoes ja foram descobertas. JOGADA NOK" << endl;
+                    jogadaValida = 0; //jogada válida vira 0 então o if de jogadas válidas não executa
+                }
+                
+                //if para jogadas validas 
+                if (jogadaValida == 1) {
+                    cout<<"\033c";
+                    int valor1 = matrizGabarito[linha1][coluna1];
+                    int valor2 = matrizGabarito[linha2][coluna2];
+                    
+                    // imprime a matriz com os dois valores escolhidos pelo usuario virados 
+                    cout << "\nCartas viradas:\n";
+                    for (int i = 0; i < TAM; i++) {
+                        for (int j = 0; j < TAM; j++) {
+                            if ((i == linha1 && j == coluna1) || (i == linha2 && j == coluna2)) //verifica se a posição atual da matriz é uma das duas que o jogador escolheu nesta jogada
+                                cout << "\t" << matrizGabarito[i][j];
+                            else if (matrizJogo[i][j] != 0) //verifica se tal posição da matriz ja foi acertada 
+                                cout << "\t" << matrizJogo[i][j];
+                            else
+                                cout << "\t" << "* "; //carta ainda virada, mostra *
+                        }
+                        cout << "\t\n";
+                    }
+
+                    if (valor1 == valor2) { //usado para informar se um par foi encontrado pelo usuario 
+                        cout << "Par encontrado! JOGADA OK\n";
+                        matrizJogo[linha1][coluna1] = valor1;
+                        matrizJogo[linha2][coluna2] = valor2;
+                        pares++; //contador de pares, encerra o jogo com o jogador ganhando se chegar a 8 pares
+                    } else {
+                        cout << "Valores diferentes. JOGADA NOK\n";
+                    }
+                    jogadas++; 
+                    cout << "Jogadas realizadas: " << jogadas << "\n";
+
+                }
+            }
+            cout<<"\033c"; //limpa a tela
+
+            if (pares == 8) { //se o usuario acertar os 8 pares ele vence e o jogo acaba
+                cout << "PARABENS! Voce venceu o jogo!" << endl;
+            } else { //se nao acertar os oito pares o usuario perde 
+                cout << "FIM DE JOGO. Voce perdeu!" << endl;
+            }
+            
+            //imprime a matriz gabarito no final
+            cout << "\nMatriz Gabarito:\n";
+            for (int i = 0; i < TAM; i++) {
+                for (int j = 0; j < TAM; j++) {
+                    cout << "\t" << matrizGabarito[i][j];
+                }
+                cout << "\t\n";
+            }
+
+            break;
+        }
+
+        case 2:
+            cout<<"\033c";
+            cout << "Jogo encerrado pelo usuario.\n";
+            break;
+
+        default:
+            cout << "Opcao invalida!\n";
+            break;
+        }
+
+    } while (opcao != 2);
+    
+    cout<<"\033c";
+
+    cout << "Programa finalizado" << endl;
+    return 0;
+}
